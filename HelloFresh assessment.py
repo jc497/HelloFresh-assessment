@@ -30,10 +30,6 @@ df_extracted
 df_extracted['cookTime'] = df_extracted['cookTime'].str.replace('PT', '')
 df_extracted['prepTime'] = df_extracted['prepTime'].str.replace('PT', '')
 
-# put zero into the blank cell
-df_extracted['cookTime'] = df_extracted['cookTime'].replace('',0)
-df_extracted['prepTime'] = df_extracted['prepTime'].replace('',0)
-
 # divide hours and minutes for cookTime and prepTime
 df_extracted['cookTime_H'] = df_extracted['cookTime'].str.extract(r'(\d+)H', expand=False).fillna(0).astype(int)
 df_extracted['cookTime_M'] = df_extracted['cookTime'].str.extract(r'(\d+)M', expand=False).fillna(0).astype(int)
