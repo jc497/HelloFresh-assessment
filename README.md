@@ -11,7 +11,12 @@ The final result is saved in the file `result.csv`.
 ### Instructions and explanations of the code
 Q1: I downloaded the json file from the [link](https://bnlf-tests.s3.eu-central-1.amazonaws.com/recipes.json) and named it as `recipes.json`.
 
-Q2: The json file consist of multiple recipes. To find the similar word of "chilies", first define the search term and use `re.compile` function to find the similar words in the recipe. As the word "chilies" should appear in the ingredients field, so the pattern is searched in the strings of ingredients. 
+Q2: The json file consist of multiple recipes. To find the similar word of "chilies", first define the search term and use `re.compile` function to find the similar words in the recipe. As the word "chilies" should appear in the ingredients field, so the pattern is searched in the strings of ingredients. The extracted recipes was stored in `df_extracted`.
 
 Q3: The first step is to remove the character "PT" from both `cookTime` and `prepTime` columns. 
-The second step is to 
+Because only `cookTime` contains hours, this column is first divided into hours and minutes with numbers only, which are columns  `cookTime_H` and `cookTime_M` respectively. The numbers of `prepTime` is also extracted and stored in column `prepTime_M`. Zero was also added to the blank cell.
+To convert the hours into minutes, time the hours with 60 and add it with `cookTime_M` and `prepTime_M`. The sum of these three columns is stored in `totalTime`.
+To add the difficulty level to the dataframe, use `def` function to identify the criteria.
+Finally add the column `difficulty` to the dataframe with four levels: Easy, Medium, Hard and Unknown.
+
+Q4: Store the final result as csv file in `result.csv`
