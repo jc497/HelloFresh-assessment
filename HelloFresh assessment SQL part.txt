@@ -1,0 +1,75 @@
+1. For the customer with email address 'ilovefood83@hotmail.com' show all product_skus the customer has an active subscription for
+
+SELECT product.product_sku FROM product 
+JOIN subscription ON subscription.fk_product_subscribed_to = product.id_product 
+JOIN customer ON subscription.customer = customer.id_customer
+WHERE customer.email = 'ilovefood83@hotmail.com'
+AND subscription.status = 'active';
+
+
+2. Get a list of all the customers (id_customer) that have an active subscription to a product that corresponds to a product family with product_family_handle = ‘classic-box’
+
+WITH product_temp AS (
+    SELECT * FROM product 
+    LEFT JOIN product_family ON product.fk_product_family = product_family.id_product_family),
+
+sub_temp AS (
+    SELECT * FROM product_temp 
+    LEFT JOIN subscription ON subscription.fk_product_subscribed_to = product_temp.id_product)
+
+SELECT id_customer 
+FROM customer 
+LEFT JOIN sub_temp ON customer.id = sub_temp.fk_product_subscribed_to;
+
+3. How many customers have ordered more than one product?
+
+WITH tmp 
+AS (
+    SELECT * FROM subscription 
+    LEFT JOIN order ON order.fk_subscription = subscription.id_subscription
+    LEFT JOIN product ON product.fk_product_subscribed_to = product.id_product
+    GROUP BY product.product_sku)
+
+SELECT COUNT(customer.id_customer) 
+FROM customer 
+LEFT JOIN tmp ON customer.id_customer = tmp.id_subscription
+GROUP BY tmp.product_sku
+HAVING COUNT(tmp.id_product) > 1;
+
+4. Get a list of all customers which got a box delivered to them two weeks ago, and the 
+count of boxes that had been delivered to them up to that week
+
+WITH order_customer 
+AS (
+    SELECT *
+    FROM subscription 
+    LEFT JOIN order ON order.fk_subscription = subscription.id_subscription
+    WHERE delivery_date <= DATE_SUB(CURRENT_DATE(), INTERVAL 14 DAY)
+    GROUP BY fk_customer)
+
+SELECT COUNT(order_customer.fk_customer) AS order_num, CONCAT(customer.first_name, ' ', customer.last_name) AS full_name
+FROM customer 
+LEFT JOIN order_customer ON customer.id_customer = order_customer.fk_customer
+GROUP BY full_name
+HAVING order_count > 0;
+
+
+5. For all our customers, get the date of the latest order delivered to them and include
+associated product_sku, delivery_date and purchase price. 
+If there were two orders delivered to the same customer on the same date, they should both appear
+
+WITH temp_2 AS (
+    SELECT * FROM product 
+    LEFT JOIN `order` ON product.fk_order = `order`.id_order),
+
+sub_temp_2 AS (
+    SELECT * FROM temp_2 
+    LEFT JOIN subscription ON subscription.fk_product_subscribed_to = temp_2.id_product)  
+
+SELECT id_customer, delivery_date, product_SKU, purchase_price 
+FROM customer
+LEFT JOIN sub_temp_2 ON subscription.fk_customer = customer.id_customer
+ORDER BY id_customer, delivery_date DESC;
+
+
+
